@@ -1,10 +1,3 @@
-// export default function Home() {
-//   return (
-//     <div>
-//       {/* Add your content here */}
-//     </div>
-//   );
-// }
 import Image from 'next/image';
 import Link from 'next/link';
 import './globals.css'
@@ -36,7 +29,7 @@ export default function HomePage() {
           IMAGE
         </div>
         <div>
-          <Link href="/talk-room">
+          <Link href="/composer-talk">
             <div className="flex items-center p-5 bg-gray-50 rounded-2xl cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
               <Image src={menuItems[0].icon} alt={menuItems[0].title} width={40} height={40} />
               <div className="ml-4 flex-grow">
