@@ -80,7 +80,7 @@ const cards = [
     },
     {
         id: 11,
-        title: 'l다람쥐',
+        title: '성공',
         description: '마음 깊이 파고들다',
         era: 'romantic',
         continent: 'south-america'
