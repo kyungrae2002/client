@@ -1,7 +1,9 @@
 'use client'
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+// import Link from 'next/link';
+import ComposerProfile from './composer-profile';
+import FloatingButtons from './floating-buttons';
 
 // --- Mock Data ---
 // This data simulates what you would receive from a backend API.
@@ -75,42 +77,16 @@ type Post = (typeof mockPosts)[0];
 // --- Reusable Icon Components ---
 // Simple SVG icons to match the design.
 const CategoryIcon = () => (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="1" y="0.73" width="10" height="10" fill="#E4E4E7" />
-    </svg>
+    <Image src="/icons/write.svg" alt="카테고리" width={12} height={12} />
 );
 const LikeIcon = () => (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="1" y="1.5" width="10" height="10" fill="#172554" />
-    </svg>
+    <Image src="/icons/heart.svg" alt="좋아요" width={15} height={15} />
 );
 const CommentIcon = () => (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="2" y="2" width="8" height="8" stroke="#172554" strokeWidth="1.5" />
-    </svg>
+    <Image src="/icons/message.svg" alt="댓글" width={12} height={12} />
 );
 
 // --- Sub-components for Page ---
-
-// Composer Profile Card Component
-function ComposerProfile() {
-    return (
-        <div className="mb-4 bg-white rounded-2xl shadow-[0px_0px_7px_-3px_rgba(0,0,0,0.15)] border border-zinc-200 p-5 flex flex-col gap-3">
-            <div className="flex flex-col gap-1">
-                <div className="flex justify-between items-start">
-                    <h1 className="text-zinc-900 text-xl font-semibold">세르게이 라흐마니노프</h1>
-                    <button className="h-6 px-2 py-1 bg-blue-900 rounded-full flex justify-center items-center gap-0.5 text-neutral-100 text-xs font-medium">
-                        연주회 정보
-                    </button>
-                </div>
-                <p className="text-neutral-400 text-xs font-medium">남성 | 러시아 | 1873 - 1943</p>
-                <p className="text-zinc-400 text-xs font-medium whitespace-pre-line">
-                    Sergei Vasil'evich Rachmaninov{'\n'}Сергей Васильевич Рахманинов
-                </p>
-            </div>
-        </div>
-    );
-}
 
 // Single Post Item Component
 function PostItem({ post }: { post: Post }) {
@@ -136,7 +112,7 @@ function PostItem({ post }: { post: Post }) {
                             ))}
                         </div>
                         <div className="flex items-center gap-3 text-xs text-zinc-400 font-medium">
-                            <div className="flex items-center gap-0.5 text-blue-900">
+                            <div className="flex items-center gap-0.3 text-blue-900">
                                 <LikeIcon />
                                 <span>{post.likes}</span>
                             </div>
@@ -170,28 +146,6 @@ function PostItem({ post }: { post: Post }) {
     );
 }
 
-// Floating Action Buttons
-function FloatingButtons() {
-    return (
-        <>
-            {/* Write Button */}
-            <Link href="/write">
-                <div className="fixed bottom-20 left-1/2 -translate-x-1/2 px-6 py-3 bg-blue-900 rounded-full shadow-lg flex justify-center items-center gap-1.5 z-10">
-                    <Image src="/icons/write-white.svg" alt="글쓰기" width={24} height={24} />
-                    <span className="text-white text-base font-semibold">글쓰기</span>
-                </div>
-            </Link>
-
-            {/* Scroll to Top Button */}
-            <button
-                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="fixed bottom-20 right-5 p-3 bg-white rounded-full shadow-lg z-10"
-            >
-                <Image src="/icons/top.svg" alt="맨 위로" width={24} height={24} />
-            </button>
-        </>
-    );
-}
 
 // --- Main Page Component ---
 export default function ComposerTalkPage() {
