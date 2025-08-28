@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import './globals.css';
+import ScrollButton from '@/components/scroll_button';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     <main className="w-full flex-1">
                         {children}
                     </main>
+                    <ScrollButton />
                 </div>
             </body>
         </html>
