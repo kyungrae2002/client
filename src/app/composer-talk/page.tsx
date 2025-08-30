@@ -118,7 +118,7 @@ export default function ComposerTalkPage() {
             {/* 카드 목록 (스크롤 영역) */}
             <div className="flex flex-col gap-4 pb-8">
                 {filteredCards.map((card) => (
-                    <Link key={card.title} href={`/book/${card.id}`}>
+                    <Link key={card.title} href={`/composer-talk-room/${card.id}`}>
                         <div
                             className="p-6 bg-white rounded-2xl shadow-sm flex justify-between items-center gap-5"
                         >

@@ -1,7 +1,7 @@
 'use client'
 import React from 'react';
 import Image from 'next/image';
-// import Link from 'next/link';
+import Link from 'next/link';
 import ComposerProfile from './composer-profile';
 import FloatingButtons from './floating-buttons';
 
@@ -148,7 +148,7 @@ function PostItem({ post }: { post: Post }) {
 
 
 // --- Main Page Component ---
-export default function ComposerTalkPage() {
+export default function ComposerTalkPage({ params }: { params: { id: string } }) {
     return (
         <div>
             {/* Composer Profile도 id에 맞는 정보로 바뀌어야함 */}
@@ -157,7 +157,9 @@ export default function ComposerTalkPage() {
             {/* Post List */}
             <section>
                 {mockPosts.map((post) => (
-                    <PostItem key={post.id} post={post} />
+                    <Link key={post.id} href={`/composer-talk-room/${params.id}/${post.id}`}>
+                        <PostItem post={post} />
+                    </Link>
                 ))}
             </section>
 
