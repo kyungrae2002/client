@@ -26,7 +26,7 @@ export default function ComposerTalkLayout({ children }: { children: React.React
                     </Link>
                 </div>
             </header>
-            <main className="w-[375px] px-5 flex-1 overflow-y-auto">{children}</main>
+            <main className="w-[375px] flex-1 overflow-y-auto">{children}</main>
         </div>
     );
 }

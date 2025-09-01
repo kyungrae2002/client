@@ -150,7 +150,7 @@ function PostItem({ post }: { post: Post }) {
 // --- Main Page Component ---
 export default function ComposerTalkPage({ params }: { params: { id: string } }) {
     return (
-        <div>
+        <div className="px-5">
             {/* Composer Profile도 id에 맞는 정보로 바뀌어야함 */}
             <ComposerProfile />
 
