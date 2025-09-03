@@ -159,7 +159,6 @@ export default function ComposerTalkPage() {
 
             {/* 카드 목록 (스크롤 영역) */}
             <div className="flex flex-col gap-4 pb-8">
-<<<<<<< HEAD
                 {filteredCards.length === 0 ? (
                     <div className="text-center py-12">
                         <p className='text-gray-500 text-sm'>검색 결과가 없습니다.</p>
@@ -168,13 +167,6 @@ export default function ComposerTalkPage() {
                 filteredCards.map((card) => (
                     <Link key={card.title} href={`/book/${card.id}`}>
                         <div className="p-6 bg-white rounded-2xl shadow-sm flex justify-between items-center gap-5">
-=======
-                {filteredCards.map((card) => (
-                    <Link key={card.title} href={`/composer-talk-room/${card.id}`}>
-                        <div
-                            className="p-6 bg-white rounded-2xl shadow-sm flex justify-between items-center gap-5"
-                        >
->>>>>>> feature/composer-talk-room
                             <div className="flex flex-col gap-0.5 flex-grow">
                                 <div className="text-stone-300 text-xs font-semibold">{card.description}</div>
                                 <div className="text-zinc-900 text-xl font-semibold">{card.title}</div>
