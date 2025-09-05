@@ -101,9 +101,9 @@ const cards = [
     },
 ];
 
-interface Filters{
-    era : string[];
-    continent : string[];
+interface Filters {
+    era: string[];
+    continent: string[];
 }
 
 export default function ComposerTalkPage() {
@@ -129,17 +129,17 @@ export default function ComposerTalkPage() {
         setHasActiveFilters(hasActive);
     };
 
-     const filteredCards = cards.filter((card) => {
+    const filteredCards = cards.filter((card) => {
         // 검색어 필터링
-        const matchesSearch = searchTerm === '' || 
+        const matchesSearch = searchTerm === '' ||
             card.title.toLowerCase().includes(searchTerm.toLowerCase());
 
         // 시대별 필터링
-        const matchesEra = filters.era.length === 0 || 
+        const matchesEra = filters.era.length === 0 ||
             filters.era.includes(card.era);
 
         // 대륙별 필터링
-        const matchesContinent = filters.continent.length === 0 || 
+        const matchesContinent = filters.continent.length === 0 ||
             filters.continent.includes(card.continent);
 
         return matchesSearch && matchesEra && matchesContinent;
@@ -148,14 +148,25 @@ export default function ComposerTalkPage() {
     return (
         <div className="relative">
             {/* 검색바 */}
-            <Searchbar 
-                searchTerm={searchTerm} 
+            <Searchbar
+                searchTerm={searchTerm}
                 onSearchChange={handleSearchChange}
                 onFilterClick={handleFilterToggle}
                 hasActiveFilters={hasActiveFilters} />
 
             {/* 필터 */}
             <Filter onFiltersChange={handleFiltersChange} isOpen={isFilterOpen} onHasActiveFiltersChange={handleHasActiveFiltersChange} />
+
+            {/* 작곡가 토크룸 소개 */}
+            <div className="relative my-4 -mx-5 bg-white p-5 flex flex-col justify-between h-48">
+                <div>
+                    <Image src="/icons/logo_토크룸.svg" alt="토크룸 로고" width={195} height={48} />
+                </div>
+                <div className="text-right">
+                    <div className="self-stretch text-right justify-center text-neutral-600 text-sm font-semibold font-['Pretendard']">나만의 이야기와 취향을 담아 클래식을 추천하는 공간</div>
+                    <div className="self-stretch text-right justify-center text-zinc-300 text-xs font-medium font-['Pretendard'] mt-1">다람쥐 여러분, 누구나 이곳에서 큐레이터가 될 수 있습니다.<br/>자신의 이야기를 담아 곡과 음반, 영상을 추천해보세요.</div>
+                </div>
+            </div>
 
             {/* 카드 목록 (스크롤 영역) */}
             <div className="flex flex-col gap-4 pb-8">
@@ -164,20 +175,21 @@ export default function ComposerTalkPage() {
                         <p className='text-gray-500 text-sm'>검색 결과가 없습니다.</p>
                     </div>
                 ) : (
-                filteredCards.map((card) => (
-                    <Link key={card.title} href={`/book/${card.id}`}>
-                        <div className="p-6 bg-white rounded-2xl shadow-sm flex justify-between items-center gap-5">
-                            <div className="flex flex-col gap-0.5 flex-grow">
-                                <div className="text-stone-300 text-xs font-semibold">{card.description}</div>
-                                <div className="text-zinc-900 text-xl font-semibold">{card.title}</div>
+                    filteredCards.map((card) => (
+                        <Link key={card.title} href={`/composer-talk-room/${card.id}`}>
+                            <div className="p-6 bg-white rounded-2xl shadow-sm flex justify-between items-center gap-5">
+                                <div className="flex flex-col gap-0.5 flex-grow">
+                                    <div className="text-stone-300 text-xs font-semibold">{card.description}</div>
+                                    <div className="text-zinc-900 text-xl font-semibold">{card.title}</div>
+                                </div>
+                                <HeartButton />
                             </div>
-                            <HeartButton />
-                        </div>
-                    </Link>
-                ))
-            )}            
+                        </Link>
+                    ))
+                )}
+            </div>
         </div>
-    </div>
-    )};
+    )
+};
 //이제 데이터를 어떤식으로 받아야하는지 정해야함.
 //id를 기준으로 페이지를 넘길건지 slug를 통해 넘길지...
