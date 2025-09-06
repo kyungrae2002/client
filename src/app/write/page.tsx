@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 // Reusable component for section headers
 const SectionHeader = ({ title }: { title: string }) => (
     <div className="self-stretch px-5 py-3.5 bg-gray-100">
-        <p className="text-neutral-600 text-xs font-medium">{title}</p>
+        <p className="text-neutral-600 text-xs font-medium font-['Pretendard']">{title}</p>
     </div>
 );
 
@@ -64,8 +64,9 @@ export default function WritePage() {
                         className="w-full self-stretch px-6 py-4 bg-white flex justify-between items-center gap-2 text-left"
                     >
                         <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 relative flex items-center justify-center">
-                                <div className="w-2.5 h-2.5 bg-blue-900 rounded-full" />
+                            <div className="relative flex items-center justify-center">
+                                {/* <div className="w-2.5 h-2.5 bg-blue-900 rounded-full" /> */}
+                                <Image src="/icons/write-blue.svg" alt="post type" width={16} height={16} />
                             </div>
                             <p className="text-zinc-900 text-sm font-semibold">{selectedType}</p>
                         </div>
