@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import ComposerSearch from './composer-search';
@@ -18,6 +18,8 @@ export default function WritePage() {
     const [content, setContent] = useState('');
     const [hashtags, setHashtags] = useState('');
     const [link, setLink] = useState('');
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [selectedType, setSelectedType] = useState('라흐마니노프 이야기');
     const postTypes = ['큐레이션 글', '라흐마니노프 이야기'];
@@ -29,13 +31,63 @@ export default function WritePage() {
         setShowComposerSearch(false);
     };
 
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files[0]) {
+            setImageFile(event.target.files[0]);
+        }
+    };
+
+    const handleImageUploadClick = () => {
+        fileInputRef.current?.click();
+    };
+
     const isButtonEnabled = title.trim() !== '' && content.trim() !== '';
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
         if (!isButtonEnabled) return;
-        // Logic to submit the post
-        console.log({ title, content, hashtags, link });
-        // Example: router.push('/success-page');
+
+        const formData = new FormData();
+        formData.append('postType', selectedType);
+        if (selectedType === '큐레이션 글' && selectedComposer) {
+            formData.append('composer', selectedComposer);
+        }
+        formData.append('title', title);
+        formData.append('content', content);
+        formData.append('hashtags', hashtags);
+        formData.append('link', link);
+        if (imageFile) {
+            formData.append('image', imageFile);
+        }
+
+        // For demonstration: log FormData entries
+        console.log('--- Form Data to be Sent ---');
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}:`, value);
+        }
+        console.log('--------------------------');
+
+        try {
+            // Replace with your actual backend API endpoint
+            const response = await fetch('/api/posts', {
+                method: 'POST',
+                body: formData,
+                // Headers might be set automatically by the browser for FormData,
+                // but if you need to add an Authorization token, do it here.
+                // headers: { 'Authorization': 'Bearer your_token' }
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Post created successfully:', result);
+                alert('등록되었습니다.');
+                // Redirect to the new post or another page
+                // router.push(`/composer-talk-room/${result.postId}`);
+            } else {
+                console.error('Failed to create post:', response.statusText);
+            }
+        } catch (error) {
+            console.error('An error occurred while creating the post:', error);
+        }
     };
 
     const handleSaveDraft = () => {
@@ -161,10 +213,22 @@ export default function WritePage() {
                         onChange={(e) => setLink(e.target.value)}
                         className="flex-1 px-3.5 py-2.5 bg-gray-100 rounded-[10px] text-sm font-medium focus:outline-none placeholder-neutral-400"
                     />
-                    <button className="w-11 h-11 bg-gray-100 rounded-[10px] flex justify-center items-center">
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleImageChange}
+                        className="hidden"
+                        accept="image/*"
+                    />
+                    <button onClick={handleImageUploadClick} className="w-11 h-11 bg-gray-100 rounded-[10px] flex justify-center items-center">
                         <Image src="/icons/img.svg" alt="이미지 첨부" width={24} height={24} />
                     </button>
                 </div>
+                {imageFile && (
+                    <div className="px-5 pb-4 bg-white">
+                        <p className="text-sm text-gray-600">첨부된 이미지: {imageFile.name}</p>
+                    </div>
+                )}
             </main>
         </div>
     );
