@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import ComposerSearch from './composer-search';
 
 // Reusable component for section headers
 const SectionHeader = ({ title }: { title: string }) => (
@@ -20,6 +21,13 @@ export default function WritePage() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [selectedType, setSelectedType] = useState('라흐마니노프 이야기');
     const postTypes = ['큐레이션 글', '라흐마니노프 이야기'];
+    const [selectedComposer, setSelectedComposer] = useState<string | null>(null);
+    const [showComposerSearch, setShowComposerSearch] = useState(true);
+
+    const handleSelectComposer = (composerName: string) => {
+        setSelectedComposer(composerName);
+        setShowComposerSearch(false);
+    };
 
     const isButtonEnabled = title.trim() !== '' && content.trim() !== '';
 
@@ -89,6 +97,28 @@ export default function WritePage() {
                         </div>
                     )}
                 </div>
+
+                {selectedType === '큐레이션 글' && (
+                    <>
+                        <SectionHeader title="작곡가 선택" />
+                        {showComposerSearch ? (
+                            <ComposerSearch onSelectComposer={handleSelectComposer} />
+                        ) : (
+                            <div className="p-5 bg-white flex justify-between items-center">
+                                <p className="font-semibold">{selectedComposer}</p>
+                                <button
+                                    onClick={() => {
+                                        setShowComposerSearch(true);
+                                        setSelectedComposer(null);
+                                    }}
+                                    className="text-sm text-gray-500"
+                                >
+                                    변경
+                                </button>
+                            </div>
+                        )}
+                    </>
+                )}
 
                 <SectionHeader title="게시글 제목" />
                 <div className="self-stretch px-5 py-2 bg-white">
