@@ -2,25 +2,50 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import CommentItem from './comment-item';
-import { mockComments, Comment } from './page'; // Mock data and type from page.tsx
+// Comment type definition
+type Comment = {
+  id: number;
+  author: string;
+  timestamp: string;
+  content: string;
+  isHeartSelected: boolean;
+  isReply: boolean;
+};
+
 
 const COMMENTS_PER_PAGE = 5;
 
-export default function CommentList() {
-  const [comments, setComments] = useState<Comment[]>(mockComments.slice(0, COMMENTS_PER_PAGE));
+interface CommentListProps {
+  composerId?: string;
+  initialComments: Comment[];
+  onAddComment?: (content: string, isReply?: boolean, replyToId?: number) => void;
+  onReply?: (commentId: number, author: string) => void;
+  onReportOpen?: () => void;
+  onReportClose?: () => void;
+}
+
+export default function CommentList({ composerId, initialComments, onAddComment, onReply, onReportOpen, onReportClose }: CommentListProps) {
+  const [comments, setComments] = useState<Comment[]>(initialComments.slice(0, COMMENTS_PER_PAGE));
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(mockComments.length > COMMENTS_PER_PAGE);
+  const [hasMore, setHasMore] = useState(initialComments.length > COMMENTS_PER_PAGE);
   const loader = useRef(null);
+
+  // initialComments가 변경될 때마다 comments 업데이트
+  useEffect(() => {
+    const currentPageComments = initialComments.slice(0, page * COMMENTS_PER_PAGE);
+    setComments(currentPageComments);
+    setHasMore(currentPageComments.length < initialComments.length);
+  }, [initialComments, page]);
 
   const loadMoreComments = () => {
     if (!hasMore) return;
 
     const nextPage = page + 1;
-    const newComments = mockComments.slice(0, nextPage * COMMENTS_PER_PAGE);
+    const newComments = initialComments.slice(0, nextPage * COMMENTS_PER_PAGE);
     
     setComments(newComments);
     setPage(nextPage);
-    if (newComments.length >= mockComments.length) {
+    if (newComments.length >= initialComments.length) {
       setHasMore(false);
     }
   };
@@ -52,9 +77,20 @@ export default function CommentList() {
 
   return (
     <>
-      {comments.map((comment) => (
-        <CommentItem key={comment.id} comment={comment} isReply={comment.isReply} />
-      ))}
+      {comments.map((comment) => {
+        const CommentItemWithProps = CommentItem as any;
+        return (
+          <CommentItemWithProps 
+            key={comment.id} 
+            comment={comment} 
+            isReply={comment.isReply} 
+            composerId={composerId}
+            onReply={onReply}
+            onReportOpen={onReportOpen}
+            onReportClose={onReportClose}
+          />
+        );
+      })}
       {hasMore && (
         <div ref={loader} className="py-4 text-center text-zinc-500">
           댓글을 불러오는 중...
