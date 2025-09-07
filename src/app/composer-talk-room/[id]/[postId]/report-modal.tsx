@@ -6,6 +6,7 @@ import Image from 'next/image';
 interface ReportModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSubmit?: () => void;
   postId: string;
   composerId: string;
 }
@@ -20,7 +21,7 @@ const REPORT_REASONS = [
   '기타'
 ];
 
-export function ReportModal({ isOpen, onClose, postId, composerId }: ReportModalProps) {
+export function ReportModal({ isOpen, onClose, onSubmit, postId, composerId }: ReportModalProps) {
   const [selectedReason, setSelectedReason] = useState('');
   const [additionalComment, setAdditionalComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -47,7 +48,11 @@ export function ReportModal({ isOpen, onClose, postId, composerId }: ReportModal
 
       if (response.ok) {
         alert('신고가 접수되었습니다.');
-        onClose();
+        if (onSubmit) {
+          onSubmit();
+        } else {
+          onClose();
+        }
       } else {
         alert('신고 접수 중 오류가 발생했습니다.');
       }
@@ -64,7 +69,7 @@ export function ReportModal({ isOpen, onClose, postId, composerId }: ReportModal
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
       <div className="bg-white w-[335px] rounded-2xl p-6 mx-5">
-        {/* Header */}
+        {/* 헤더 */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-zinc-900">게시글 신고</h2>
           <button
@@ -83,7 +88,7 @@ export function ReportModal({ isOpen, onClose, postId, composerId }: ReportModal
           </button>
         </div>
 
-        {/* Report Reasons */}
+        {/* 신고 사유 */}
         <div className="mb-6">
           <h3 className="text-sm font-medium text-zinc-700 mb-3">신고 사유를 선택해주세요</h3>
           <div className="space-y-2">
@@ -103,7 +108,7 @@ export function ReportModal({ isOpen, onClose, postId, composerId }: ReportModal
           </div>
         </div>
 
-        {/* Additional Comment */}
+        {/* 추가 설명 */}
         <div className="mb-6">
           <h3 className="text-sm font-medium text-zinc-700 mb-2">추가 설명 (선택사항)</h3>
           <textarea
@@ -118,7 +123,7 @@ export function ReportModal({ isOpen, onClose, postId, composerId }: ReportModal
           </div>
         </div>
 
-        {/* Buttons */}
+        {/* 버튼 */}
         <div className="flex gap-3">
           <button
             onClick={onClose}
@@ -135,7 +140,7 @@ export function ReportModal({ isOpen, onClose, postId, composerId }: ReportModal
           </button>
         </div>
 
-        {/* Notice */}
+        {/* 공지 */}
         <div className="mt-4 p-3 bg-gray-50 rounded-lg">
           <p className="text-xs text-gray-600 leading-relaxed">
             허위 신고 시 서비스 이용에 제한이 있을 수 있으며, 신고 내용은 관리자가 검토 후 처리됩니다.
