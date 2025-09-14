@@ -1,13 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import Image from 'next/image';
-
-interface FilterProps {
-    onFiltersChange: (filters: { era: string[]; continent: string[] }) => void;
-    isOpen: boolean;
-    onHasActiveFiltersChange?: (hasActive: boolean) => void;
-}
+import React from 'react';
+import { useComposerTalk } from './context';
 
 const eraFilters = [
     { id: 'medieval', label: '중세/르네상스' },
@@ -26,65 +20,65 @@ const continentFilters = [
     { id: 'oceania', label: '오세아니아' },
 ];
 
-export default function Filter({ onFiltersChange, isOpen, onHasActiveFiltersChange }: FilterProps) {
-    const [selectedEras, setSelectedEras] = useState<string[]>([]);
-    const [selectedContinents, setSelectedContinents] = useState<string[]>([]);
+export default function Filter() {
+    const { 
+        filters, 
+        setFilters, 
+        isFilterOpen, 
+        setHasActiveFilters 
+    } = useComposerTalk();
 
     const handleEraToggle = (eraId: string) => {
-        const newSelectedEras = selectedEras.includes(eraId)
-            ? selectedEras.filter(id => id !== eraId)
-            : [...selectedEras, eraId];
+        const newSelectedEras = filters.era.includes(eraId)
+            ? filters.era.filter(id => id !== eraId)
+            : [...filters.era, eraId];
         
-        setSelectedEras(newSelectedEras);
-        onFiltersChange({
+        const newFilters = {
             era: newSelectedEras,
-            continent: selectedContinents
-        });
+            continent: filters.continent
+        };
+        
+        setFilters(newFilters);
         
         // 활성 필터 존재 여부 업데이트
-        const hasActive = newSelectedEras.length > 0 || selectedContinents.length > 0;
-        onHasActiveFiltersChange?.(hasActive);
+        const hasActive = newSelectedEras.length > 0 || filters.continent.length > 0;
+        setHasActiveFilters(hasActive);
     };
 
     const handleContinentToggle = (continentId: string) => {
-        const newSelectedContinents = selectedContinents.includes(continentId)
-            ? selectedContinents.filter(id => id !== continentId)
-            : [...selectedContinents, continentId];
+        const newSelectedContinents = filters.continent.includes(continentId)
+            ? filters.continent.filter(id => id !== continentId)
+            : [...filters.continent, continentId];
         
-        setSelectedContinents(newSelectedContinents);
-        onFiltersChange({
-            era: selectedEras,
+        const newFilters = {
+            era: filters.era,
             continent: newSelectedContinents
-        });
+        };
+        
+        setFilters(newFilters);
         
         // 활성 필터 존재 여부 업데이트
-        const hasActive = selectedEras.length > 0 || newSelectedContinents.length > 0;
-        onHasActiveFiltersChange?.(hasActive);
+        const hasActive = filters.era.length > 0 || newSelectedContinents.length > 0;
+        setHasActiveFilters(hasActive);
     };
 
     const removeFilter = (type: 'era' | 'continent', filterId: string) => {
         if (type === 'era') {
-            const newSelectedEras = selectedEras.filter(id => id !== filterId);
-            setSelectedEras(newSelectedEras);
-            onFiltersChange({
-                era: newSelectedEras,
-                continent: selectedContinents
-            });
-            
-            // 활성 필터 존재 여부 업데이트
-            const hasActive = newSelectedEras.length > 0 || selectedContinents.length > 0;
-            onHasActiveFiltersChange?.(hasActive);
+            const newFilters = {
+                era: filters.era.filter(id => id !== filterId),
+                continent: filters.continent
+            };
+            setFilters(newFilters);
+            const hasActive = newFilters.era.length > 0 || newFilters.continent.length > 0;
+            setHasActiveFilters(hasActive);
         } else {
-            const newSelectedContinents = selectedContinents.filter(id => id !== filterId);
-            setSelectedContinents(newSelectedContinents);
-            onFiltersChange({
-                era: selectedEras,
-                continent: newSelectedContinents
-            });
-            
-            // 활성 필터 존재 여부 업데이트
-            const hasActive = selectedEras.length > 0 || newSelectedContinents.length > 0;
-            onHasActiveFiltersChange?.(hasActive);
+            const newFilters = {
+                era: filters.era,
+                continent: filters.continent.filter(id => id !== filterId)
+            };
+            setFilters(newFilters);
+            const hasActive = newFilters.era.length > 0 || newFilters.continent.length > 0;
+            setHasActiveFilters(hasActive);
         }
     };
 
@@ -93,14 +87,14 @@ export default function Filter({ onFiltersChange, isOpen, onHasActiveFiltersChan
         return filters.find(filter => filter.id === filterId)?.label || '';
     };
 
-    const totalActiveFilters = selectedEras.length + selectedContinents.length;
+    const totalActiveFilters = filters.era.length + filters.continent.length;
 
     return (
         <div className="w-full mb-4">
             {/* 활성화된 필터 표시 */}
             {totalActiveFilters > 0 && (
                 <div className="flex flex-wrap gap-2 mb-4">
-                    {selectedEras.map(eraId => (
+                    {filters.era.map(eraId => (
                         <div
                             key={`era-${eraId}`}
                             className="flex items-center gap-1 bg-black text-white px-3 py-1.5 rounded-full text-sm"
@@ -114,7 +108,7 @@ export default function Filter({ onFiltersChange, isOpen, onHasActiveFiltersChan
                             </button>
                         </div>
                     ))}
-                    {selectedContinents.map(continentId => (
+                    {filters.continent.map(continentId => (
                         <div
                             key={`continent-${continentId}`}
                             className="flex items-center gap-1 bg-black text-white px-3 py-1.5 rounded-full text-sm"
@@ -132,7 +126,7 @@ export default function Filter({ onFiltersChange, isOpen, onHasActiveFiltersChan
             )}
 
             {/* 필터 옵션들 */}
-            {isOpen && (
+            {isFilterOpen && (
                 <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-4">
                     {/* 시대별 필터 */}
                     <div className="mb-6">
@@ -143,7 +137,7 @@ export default function Filter({ onFiltersChange, isOpen, onHasActiveFiltersChan
                                     key={filter.id}
                                     onClick={() => handleEraToggle(filter.id)}
                                     className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                                        selectedEras.includes(filter.id)
+                                        filters.era.includes(filter.id)
                                             ? 'bg-black text-white'
                                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                     }`}
@@ -163,7 +157,7 @@ export default function Filter({ onFiltersChange, isOpen, onHasActiveFiltersChan
                                     key={filter.id}
                                     onClick={() => handleContinentToggle(filter.id)}
                                     className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                                        selectedContinents.includes(filter.id)
+                                        filters.continent.includes(filter.id)
                                             ? 'bg-black text-white'
                                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                     }`}
