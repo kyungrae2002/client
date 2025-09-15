@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import CommentItem from './comment-item';
 // Comment type definition
 type Comment = {
@@ -37,7 +37,7 @@ export default function CommentList({ composerId, initialComments, onAddComment,
     setHasMore(currentPageComments.length < initialComments.length);
   }, [initialComments, page]);
 
-  const loadMoreComments = () => {
+  const loadMoreComments = useCallback(() => {
     if (!hasMore) return;
 
     const nextPage = page + 1;
@@ -48,7 +48,7 @@ export default function CommentList({ composerId, initialComments, onAddComment,
     if (newComments.length >= initialComments.length) {
       setHasMore(false);
     }
-  };
+  }, [hasMore, page, initialComments]);
 
   useEffect(() => {//무한스크롤의 영역
     const observer = new IntersectionObserver(
@@ -73,24 +73,21 @@ export default function CommentList({ composerId, initialComments, onAddComment,
         observer.unobserve(currentLoader);
       }
     };
-  }, [hasMore, page]); // Dependency array updated for correctness
+  }, [hasMore, page, loadMoreComments]); // Dependency array updated for correctness
 
   return (
     <>
-      {comments.map((comment) => {
-        const CommentItemWithProps = CommentItem as any;
-        return (
-          <CommentItemWithProps 
-            key={comment.id} 
-            comment={comment} 
-            isReply={comment.isReply} 
-            composerId={composerId}
-            onReply={onReply}
-            onReportOpen={onReportOpen}
-            onReportClose={onReportClose}
-          />
-        );
-      })}
+      {comments.map((comment) => (
+        <CommentItem 
+          key={comment.id} 
+          comment={comment} 
+          isReply={comment.isReply} 
+          composerId={composerId}
+          onReply={onReply}
+          onReportOpen={onReportOpen}
+          onReportClose={onReportClose}
+        />
+      ))}
       {hasMore && (
         <div ref={loader} className="py-4 text-center text-zinc-500">
           댓글을 불러오는 중...

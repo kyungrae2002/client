@@ -1,11 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Image from 'next/image';
-import Searchbar from './searchbar';
 import HeartButton from './heart-button';
 import Link from 'next/link';
-import Filter from './filter';
+import { useComposerTalk } from './context';
 
 const cards = [
     {
@@ -101,33 +100,8 @@ const cards = [
     },
 ];
 
-interface Filters {
-    era: string[];
-    continent: string[];
-}
-
 export default function ComposerTalkPage() {
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filters, setFilters] = useState<Filters>({ era: [], continent: [] });
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [hasActiveFilters, setHasActiveFilters] = useState(false);
-
-
-    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(event.target.value);
-    };
-
-    const handleFiltersChange = (newFilters: Filters) => {
-        setFilters(newFilters);
-    };
-
-    const handleFilterToggle = () => {
-        setIsFilterOpen(!isFilterOpen);
-    };
-
-    const handleHasActiveFiltersChange = (hasActive: boolean) => {
-        setHasActiveFilters(hasActive);
-    };
+    const { searchTerm, filters } = useComposerTalk();
 
     const filteredCards = cards.filter((card) => {
         // 검색어 필터링
@@ -147,18 +121,9 @@ export default function ComposerTalkPage() {
 
     return (
         <div className="relative">
-            {/* 검색바 */}
-            <Searchbar
-                searchTerm={searchTerm}
-                onSearchChange={handleSearchChange}
-                onFilterClick={handleFilterToggle}
-                hasActiveFilters={hasActiveFilters} />
-
-            {/* 필터 */}
-            <Filter onFiltersChange={handleFiltersChange} isOpen={isFilterOpen} onHasActiveFiltersChange={handleHasActiveFiltersChange} />
 
             {/* 작곡가 토크룸 소개 */}
-            <div className="relative my-4 -mx-5 bg-white p-5 flex flex-col justify-between h-48">
+            <div className="relative mt-1 mb-4 -mx-5 bg-white p-5 flex flex-col justify-between h-48">
                 <div>
                     <Image src="/icons/logo_토크룸.svg" alt="토크룸 로고" width={195} height={48} />
                 </div>
