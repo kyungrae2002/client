@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import CommentList from './comment-list';
 import CommentInput from './comment-input';
 import { ReportButton } from './report-button';
@@ -8,6 +9,7 @@ import { useState, useEffect } from 'react';
 
 // Mock Data
 const mockPostData = {
+    userId: 'user123', // Add userId to mock data
     composer: '라흐마니노프',
     author: 'Username',
     timestamp: '25/08/28 14:26',
@@ -131,7 +133,9 @@ export default function PostDetailPage({ params }: PostDetailPageProps) {
         {/* Post Content */}
         <div className="px-5 pb-5 pt-4">
             <div className="flex items-start gap-2 mb-4">
-                <div className="w-[31px] h-[31px] bg-zinc-300 rounded-md" />
+                <Link href={`/profile/${mockPostData.userId}`}>
+                    <div className="w-[31px] h-[31px] bg-zinc-300 rounded-md" />
+                </Link>
                 <div className="flex-1">
                     <p className="font-semibold text-sm text-zinc-700">{mockPostData.author}</p>
                     <p className="text-xs text-zinc-400">{mockPostData.timestamp} · {mockPostData.category}</p>
