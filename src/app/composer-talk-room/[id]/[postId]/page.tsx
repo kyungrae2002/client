@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 
 // Mock Data
 const mockPostData = {
-    userId: 'user123', // Add userId to mock data
+    userId: '123', // Add userId to mock data
     composer: '라흐마니노프',
     author: 'Username',
     timestamp: '25/08/28 14:26',
@@ -133,7 +133,7 @@ export default function PostDetailPage({ params }: PostDetailPageProps) {
         {/* Post Content */}
         <div className="px-5 pb-5 pt-4">
             <div className="flex items-start gap-2 mb-4">
-                <Link href={`/profile/${mockPostData.userId}`}>
+                <Link href={`/writer-profile/${mockPostData.userId}`}>
                     <div className="w-[31px] h-[31px] bg-zinc-300 rounded-md" />
                 </Link>
                 <div className="flex-1">
