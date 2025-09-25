@@ -108,9 +108,9 @@ export default function CommentInput({
               <>
                 <button
                   onClick={handleInputClick}
-                  className="flex items-center text-[14px] font-medium leading-[17px] text-[#A6A6A6] flex-1 text-left"
+                  className="flex items-center justify-center text-[14px] font-medium leading-[17px] text-[#A6A6A6] flex-1"
                 >
-                  댓글을 입력해주세요
+                  댓글을 남겨주세요
                 </button>
                 <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
                   <svg width="7" height="15" viewBox="0 0 7 15" fill="none">
