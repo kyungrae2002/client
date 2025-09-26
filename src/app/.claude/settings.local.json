@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/kyung/OneDrive/문서/GitHub/fuck/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
