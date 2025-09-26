@@ -7,7 +7,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html>
             <body className="min-h-screen bg-gray-100 flex justify-center">
-                {/* 전체 콘텐츠를 감싸는 컨테이너 */}
                 {/* max-w-[375px]: 최대 너비를 iPhone mini 사이즈(375px)로 정확히 제한 */}
                 <div className="w-full max-w-[375px] min-h-screen flex flex-col bg-white shadow-lg">
                     {/* 헤더 */}
@@ -20,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                             <Link href="/notification">
                                 <Image src="/icons/alarm.svg" alt="알림" width={24} height={24} />
                             </Link>
-                            <Link href="/profile">
+                            <Link href="/loginpage">
                                 <Image src="/icons/profile.svg" alt="프로필" width={32} height={32} />
                             </Link>
                         </div>
