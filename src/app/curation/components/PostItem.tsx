@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface Post {
   id: number;
@@ -23,7 +24,7 @@ export default function PostItem({ post, isFirst = false }: PostItemProps) {
   }`;
 
   return (
-    <div className={containerClasses}>
+    <Link href={`/curation/${post.id}`} className={`${containerClasses} hover:bg-gray-50 cursor-pointer transition-colors`}>
       <div className="w-60 flex flex-col justify-start items-start gap-2">
         <div className="inline-flex justify-start items-center gap-1 text-zinc-400 text-xs font-semibold">
           <Image src="/icons/music.svg" alt="큐레이션" width={12} height={12} />
@@ -78,6 +79,6 @@ export default function PostItem({ post, isFirst = false }: PostItemProps) {
       ) : (
         <div className="w-24 h-24 ml-4"></div> // 이미지가 없을 때 공간을 차지하도록 빈 div 추가
       )}
-    </div>
+    </Link>
   );
 }
