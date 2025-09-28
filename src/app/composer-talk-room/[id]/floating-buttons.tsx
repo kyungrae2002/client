@@ -13,12 +13,6 @@ export default function FloatingButtons() {
             </Link>
 
             {/* Scroll to Top Button */}
-            <button
-                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="fixed bottom-20 right-5 p-3 bg-white rounded-full shadow-lg z-10"
-            >
-                <Image src="/icons/top.svg" alt="맨 위로" width={24} height={24} />
-            </button>
         </>
     );
 }
