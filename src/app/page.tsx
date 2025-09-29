@@ -22,49 +22,64 @@ const menuItems = [
 
 export default function HomePage() {
   return (
-    <div className="p-4">
-      <div className="space-y-3">
-        
-        <div className="w-full h-54 bg-gray-200 rounded-2xl flex items-center justify-center text-gray-400 font-semibold">
-          IMAGE
+    <>
+      <header className="w-full flex justify-between items-center p-4 border-b">
+        <Link href="/" className="flex items-center">
+            <Image src="/icons/logo.svg" alt="다람쥐 로고" width={120} height={40} />
+        </Link>
+
+        <div className="flex items-center space-x-4">
+            <Link href="/notification">
+                <Image src="/icons/alarm.svg" alt="알림" width={24} height={24} />
+            </Link>
+            <Link href="/loginpage">
+                <Image src="/icons/profile.svg" alt="프로필" width={24} height={24} />
+            </Link>
         </div>
-        <div>
-          <Link href="/composer-talk">
-            <div className="flex items-center p-5 bg-gray-50 rounded-2xl cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
-              <Image src={menuItems[0].icon} alt={menuItems[0].title} width={40} height={40} />
-              <div className="ml-4 flex-grow">
-                <h2 className="font-bold text-lg transition-colors duration-200 hover:text-blue-600">{menuItems[0].title}</h2>
-                <p className="text-sm text-gray-500">{menuItems[0].description}</p>
+      </header>
+      <div className="p-4">
+        <div className="space-y-3">
+          <div className="w-full h-54 bg-gray-200 rounded-2xl flex items-center justify-center text-gray-400 font-semibold">
+            IMAGE
+          </div>
+          <div>
+            <Link href="/composer-talk">
+              <div className="flex items-center p-5 bg-gray-50 rounded-2xl cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
+                <Image src={menuItems[0].icon} alt={menuItems[0].title} width={40} height={40} />
+                <div className="ml-4 flex-grow">
+                  <h2 className="font-bold text-lg transition-colors duration-200 hover:text-blue-600">{menuItems[0].title}</h2>
+                  <p className="text-sm text-gray-500">{menuItems[0].description}</p>
+                </div>
+                <span className="text-gray-400">&gt;</span>
               </div>
-              <span className="text-gray-400">&gt;</span>
-            </div>
-          </Link>
-        </div>
-        <div>
-          <Link href="/curation">
-            <div className="flex items-center p-5 bg-gray-50 rounded-2xl cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
-              <Image src={menuItems[1].icon} alt={menuItems[1].title} width={40} height={40} />
-              <div className="ml-4 flex-grow">
-                <h2 className="font-bold text-lg transition-colors duration-200 hover:text-blue-600">{menuItems[1].title}</h2>
-                <p className="text-sm text-gray-500">{menuItems[1].description}</p>
+            </Link>
+          </div>
+          <div>
+            <Link href="/curation">
+              <div className="flex items-center p-5 bg-gray-50 rounded-2xl cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
+                <Image src={menuItems[1].icon} alt={menuItems[1].title} width={40} height={40} />
+                <div className="ml-4 flex-grow">
+                  <h2 className="font-bold text-lg transition-colors duration-200 hover:text-blue-600">{menuItems[1].title}</h2>
+                  <p className="text-sm text-gray-500">{menuItems[1].description}</p>
+                </div>
+                <span className="text-gray-400">&gt;</span>
               </div>
-              <span className="text-gray-400">&gt;</span>
-            </div>
-          </Link>
-        </div>
-        <div>
-          <Link href="/talk-room">
-            <div className="flex items-center p-5 bg-gray-50 rounded-2xl cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
-              <Image src={menuItems[2].icon} alt={menuItems[2].title} width={40} height={40} />
-              <div className="ml-4 flex-grow">
-                <h2 className="font-bold text-lg transition-colors duration-200 hover:text-blue-600">{menuItems[2].title}</h2>
-                <p className="text-sm text-gray-500">{menuItems[2].description}</p>
+            </Link>
+          </div>
+          <div>
+            <Link href="/talk-room">
+              <div className="flex items-center p-5 bg-gray-50 rounded-2xl cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
+                <Image src={menuItems[2].icon} alt={menuItems[2].title} width={40} height={40} />
+                <div className="ml-4 flex-grow">
+                  <h2 className="font-bold text-lg transition-colors duration-200 hover:text-blue-600">{menuItems[2].title}</h2>
+                  <p className="text-sm text-gray-500">{menuItems[2].description}</p>
+                </div>
+                <span className="text-gray-400">&gt;</span>
               </div>
-              <span className="text-gray-400">&gt;</span>
-            </div>
-          </Link>
-        </div> 
-        </div>
-    </div>
+            </Link>
+          </div> 
+          </div>
+      </div>
+    </>
   );
 }
