@@ -44,6 +44,7 @@ interface CommentData {
 
 // ----- 환경 스위치 -----
 const USE_MOCK = true; // 실제 연동 시 false 로 변경
+const USE_COMMENT_API = true; // 댓글 POST/GET 사용 여부 (USE_MOCK=false 와 함께 실사용 권장)
 
 // ----- 실제 API 엔드포인트 (나중에 URL 주입) -----
 // const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? 'https://api.example.com';
@@ -162,23 +163,45 @@ export default function FreeTalkPostDetail({ params }: PageProps) {
     // TODO: backend sync
   };
 
-  const handleAddComment = (content: string, isReply?: boolean, replyToId?: number) => {
-    setComments(prev => {
-      const newId = prev.length ? Math.max(...prev.map(c => c.id)) + 1 : 1;
-      const newComment: CommentData = {
-        id: newId,
-        author: '익명다람쥐',
-        timestamp: '방금',
-        content,
-        isReply: !!isReply,
-        parentId: replyToId
-      };
-      return [...prev, newComment];
-    });
-    if (!isReply) {
-      setPost(p => p ? { ...p, comments: p.comments + 1 } : p);
-    }
+  const handleAddComment = async (content: string, isReply?: boolean, replyToId?: number) => {
+    // 낙관적 UI 반영
+    const optimisticId = Date.now();
+    const optimistic: CommentData = {
+      id: optimisticId,
+      author: '익명다람쥐',
+      timestamp: '방금',
+      content,
+      isReply: !!isReply,
+      parentId: replyToId
+    };
+    setComments(prev => [...prev, optimistic]);
+    if (!isReply) setPost(p => p ? { ...p, comments: p.comments + 1 } : p);
     setReplyMode(null);
+
+    if (USE_COMMENT_API) {
+      try {
+        const res = await fetch(`/api/free-talk/${postId}/comments`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content, parentId: replyToId })
+        });
+        if (res.ok) {
+          const json = await res.json();
+          if (json?.comment) {
+            // 낙관적 항목 교체
+            setComments(prev => prev.map(c => c.id === optimisticId ? { ...json.comment, timestamp: '방금' } : c));
+          }
+        } else {
+          throw new Error('댓글 전송 실패');
+        }
+      } catch (e) {
+        console.error(e);
+        // 롤백
+        setComments(prev => prev.filter(c => c.id !== optimisticId));
+        if (!isReply) setPost(p => p ? { ...p, comments: Math.max(0, p.comments - 1) } : p);
+        alert('댓글 전송에 실패했습니다. 다시 시도해주세요.');
+      }
+    }
   };
 
   const handleReply = (commentId: number, author: string) => {
@@ -211,13 +234,15 @@ export default function FreeTalkPostDetail({ params }: PageProps) {
       <div className="bg-white w-96 mx-auto shadow-[0_0_0_1px_rgba(0,0,0,0.02)]">
         {/* Header */}
         <div className="h-14 flex items-center gap-1 px-5 border-b border-neutral-100">
-          <Link href="/free-talk" className="w-6 h-6 flex items-center justify-center" aria-label="뒤로가기">
-            <svg width="7" height="15" viewBox="0 0 7 15" fill="none">
-              <path d="M1 1L6 7.5L1 14" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <Link href="/free-talk" className="w-9 h-9 -ml-2 flex items-center justify-center rounded-full hover:bg-neutral-100 active:bg-neutral-200" aria-label="뒤로가기">
+            <svg width="18" height="18" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+              <path d="M18 22L11 14.5L18 7" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </Link>
-          <div className="flex-1 text-zinc-900 text-base font-semibold text-center -ml-6">자유 토크룸</div>
-          <div className="w-6 h-6 flex items-center justify-center"><ReportButton postId={post.id} composerId={post.userId} onOpenChange={(o)=> setHideInput(o)} /></div>
+          <div className="flex-1 text-zinc-900 text-base font-semibold text-center">자유 토크룸</div>
+          <div className="w-9 h-9 flex items-center justify-center -mr-2">
+            <ReportButton postId={post.id} composerId={post.userId} onOpenChange={(o)=> setHideInput(o)} />
+          </div>
         </div>
 
         {/* Writer Info */}

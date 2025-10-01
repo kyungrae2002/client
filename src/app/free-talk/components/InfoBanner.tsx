@@ -5,7 +5,7 @@ import Image from 'next/image';
 export default function InfoBanner() {
   return (
     <div className="self-stretch px-6 py-7 bg-white flex flex-col justify-start items-start gap-3.5 overflow-hidden">
-      <div className="relative w-full h-10">
+      <div className="relative w-full h-16">
         <Image 
             src="/icons/freetalk-logo.svg" 
             alt="자유 토크룸 로고" 
