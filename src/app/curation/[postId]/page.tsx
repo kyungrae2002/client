@@ -7,20 +7,54 @@ import CommentInput from './comment-input';
 import { ReportButton } from './report-button';
 import { useState, useEffect } from 'react';
 
-// Mock Data
-const mockPostData = {
-    userId: '123', // Add userId to mock data
-    composer: '라흐마니노프',
-    author: 'Username',
-    timestamp: '25/08/28 14:26',
-    category: '라흐마니노프 이야기',
-    postType: '자유글',
-    title: '제목이 들어갈 자리입니다',
-    content: '글 내용이 들어갈 자리입니다. 글자수는 아 이게몇개냐\n가나다라마바사아자차카타파하가나다라마바사아자차카타파하\n28자입니다 최대',
-    tags: ['#태그01', '#태그02', '#태그03'],
-    images: ['/images/placeholder-1.png', '/images/placeholder-2.png', '/images/placeholder-3.png'],
-    likes: 12,
-    scraps: 3,
+// Mock Data - postId에 따라 다른 데이터를 반환
+const getMockPostData = (postId: string) => {
+  const posts = {
+    '1': {
+      userId: '123',
+      composer: '큐레이션',
+      author: 'Username',
+      timestamp: '25/08/28 14:26',
+      category: '큐레이션글',
+      postType: '큐레이션',
+      title: '제목이 들어갈 자리입니다',
+      content: '글 내용이 들어갈 자리입니다. 글자수는 아 이게몇개냐\n가나다라마바사아자차카타파하가나다라마바사아자차카타파하\n28자입니다 최대',
+      tags: ['#태그01', '#태그02', '#태그03'],
+      images: ['/images/placeholder-1.png', '/images/placeholder-2.png'],
+      likes: 12,
+      scraps: 3,
+    },
+    '2': {
+      userId: '456',
+      composer: '큐레이션',
+      author: '음악애호가',
+      timestamp: '25/08/29 10:15',
+      category: '큐레이션글',
+      postType: '큐레이션',
+      title: '라흐마니노프의 피아노 협주곡 2번',
+      content: '오늘은 제가 정말 사랑하는 클래식 음악에 대해 이야기해보려고 합니다.\n라흐마니노프의 피아노 협주곡 2번은 정말 감동적인 곡입니다.',
+      tags: ['#라흐마니노프', '#피아노협주곡', '#클래식'],
+      images: ['/images/placeholder-3.png'],
+      likes: 25,
+      scraps: 8,
+    },
+    '3': {
+      userId: '789',
+      composer: '큐레이션',
+      author: '클래식러버',
+      timestamp: '25/08/30 16:45',
+      category: '큐레이션글',
+      postType: '큐레이션',
+      title: '베토벤 교향곡 9번 합창 추천',
+      content: '베토벤의 교향곡 9번 합창은 클래식 음악의 최고 걸작 중 하나입니다.\n특히 4악장의 환희의 송가는 정말 압도적입니다.',
+      tags: ['#베토벤', '#교향곡', '#합창'],
+      images: [],
+      likes: 18,
+      scraps: 5,
+    }
+  };
+  
+  return posts[postId as keyof typeof posts] || posts['1'];
 };
 
 const mockComments = [
@@ -37,18 +71,16 @@ const mockComments = [
 
 type Comment = (typeof mockComments)[0];
 
-
 type PostDetailPageProps = {
   params: Promise<{
-    id: string;
     postId: string;
   }>;
 };
 
-export default function PostDetailPage({ params }: PostDetailPageProps) {
+export default function CurationPostDetail({ params }: PostDetailPageProps) {
   const [currentComments, setCurrentComments] = useState(mockComments);
-  const [composerId, setComposerId] = useState('');
   const [postId, setPostId] = useState('');
+  const [mockPostData, setMockPostData] = useState(getMockPostData('1'));
   const [replyMode, setReplyMode] = useState<{
     isReply: boolean;
     replyToId: number;
@@ -59,9 +91,9 @@ export default function PostDetailPage({ params }: PostDetailPageProps) {
 
   // params 처리
   useEffect(() => {
-    params.then(({ id, postId: pId }) => {
-      setComposerId(id);
+    params.then(({ postId: pId }) => {
       setPostId(pId);
+      setMockPostData(getMockPostData(pId));
     });
   }, [params]);
 
@@ -142,10 +174,10 @@ export default function PostDetailPage({ params }: PostDetailPageProps) {
                 </div>
                 <div className="flex items-center gap-2">
                     <div className="flex items-center gap-1 text-xs text-zinc-500 font-semibold">
-                        <Image src="/icons/talkIcon.svg" alt="" width={12} height={12} />
+                        <Image src="/icons/music.svg" alt="" width={12} height={12} />
                         <span>{mockPostData.postType}</span>
                     </div>
-                    <ReportButton postId={postId} composerId={composerId} />
+                    <ReportButton postId={postId} composerId="curation" />
                 </div>
             </div>
 
@@ -161,11 +193,13 @@ export default function PostDetailPage({ params }: PostDetailPageProps) {
                 {mockPostData.tags.map(tag => <span key={tag}>{tag}</span>)}
             </div>
 
-            <div className="flex gap-1.5 mb-4">
-                {mockPostData.images.map((src, index) => (
-                    <div key={index} className="w-[151px] h-[151px] bg-zinc-300 rounded-lg" />
-                ))}
-            </div>
+            {mockPostData.images.length > 0 && (
+              <div className="flex gap-1.5 mb-4">
+                  {mockPostData.images.map((src, index) => (
+                      <div key={index} className="w-[151px] h-[151px] bg-zinc-300 rounded-lg" />
+                  ))}
+              </div>
+            )}
 
             <div className="flex justify-between items-center">
                 <div className="flex gap-3">
@@ -188,7 +222,7 @@ export default function PostDetailPage({ params }: PostDetailPageProps) {
       {/* Comments Section */}
       <div className={`mt-1.5 flex flex-col gap-1.5 w-[375px] mx-auto ${showCommentInput ? 'pb-32' : 'pb-8'}`}>
         <CommentList 
-          composerId={composerId} 
+          composerId="curation"
           initialComments={currentComments}
           onReply={handleReply}
           onReportOpen={handleReportOpen}
