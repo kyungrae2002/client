@@ -3,12 +3,19 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState, useRef } from 'react';
+import { useRegistrationStore } from '../../../../store/registrationStore';
+import { useUserProfileStore } from '../../../../store/userProfileStore';
+import SignupSuccessPopup from '../../../../components/SignupSuccessPopup';
 
 const ProfileSetupPage = () => {
   const router = useRouter();
+  const { updateProfile, getCompleteData, clearRegistrationData } = useRegistrationStore();
+  const { loadFromRegistration, defaultProfileImage, getProfileImage, resetToDefaultImage: resetStoreToDefault } = useUserProfileStore();
   const [nickname, setNickname] = useState('');
   const [bio, setBio] = useState('');
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [profileImage, setProfileImage] = useState<string | null>(defaultProfileImage); // store에서 기본 이미지 가져오기
+  const [isLoading, setIsLoading] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -35,19 +42,114 @@ const ProfileSetupPage = () => {
     }
   };
 
+  const resetToDefaultImage = () => {
+    setProfileImage(defaultProfileImage);
+    // input 파일 선택 초기화
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const isDefaultImage = profileImage === defaultProfileImage;
+
   const isNicknameValid = nickname.length > 0 && nickname.length <= 8;
   const isBioValid = bio.length <= 12;
   const isFormValid = isNicknameValid && isBioValid && profileImage;
 
-  const handleNext = () => {
-    if (isFormValid) {
-      // 프로필 설정 완료 처리
-      console.log('프로필 설정 데이터:', { nickname, bio, profileImage });
-      // 실제로는 회원가입 완료 API 호출 또는 완료 페이지로 이동
-      alert('회원가입이 완료되었습니다!');
-      // 메인 페이지 또는 로그인 페이지로 이동
-      router.push('/');
+  const handleNext = async () => {
+    if (!isFormValid) return;
+
+    setIsLoading(true);
+
+    try {
+      // 프로필 정보를 store에 저장
+      updateProfile({
+        nickname: nickname.trim(),
+        bio: bio.trim(),
+        profileImage: profileImage
+      });
+
+      // 완전한 회원가입 데이터 가져오기
+      const completeData = getCompleteData();
+
+      if (!completeData) {
+        alert('회원가입 정보가 부족합니다. 처음부터 다시 시작해주세요.');
+        router.push('/loginpage/register');
+        return;
+      }
+
+      console.log('완전한 회원가입 데이터:', completeData);
+
+      // TODO: 백엔드 API 연결 후 주석 해제
+      /*
+      // 백엔드 API로 회원가입 요청
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: completeData.name,
+          email: completeData.email,
+          password: completeData.password,
+          birthDate: completeData.birthDate,
+          nickname: completeData.profile.nickname,
+          bio: completeData.profile.bio,
+          profileImage: completeData.profile.profileImage,
+          agreements: completeData.agreements
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // 회원가입 성공
+        console.log('회원가입 성공:', data);
+
+        // Zustand store 데이터 클리어
+        clearRegistrationData();
+
+        // 성공 팝업 표시
+        setShowSuccessPopup(true);
+
+      } else {
+        // 회원가입 실패
+        switch (response.status) {
+          case 409:
+            alert('이미 존재하는 이메일입니다.');
+            break;
+          case 400:
+            alert(data.message || '입력 정보를 확인해주세요.');
+            break;
+          default:
+            alert(data.message || '회원가입에 실패했습니다.');
+        }
+      }
+      */
+
+      // 테스트용: 백엔드 연결 전까지 임시로 성공 처리
+      console.log('회원가입 성공 (테스트):', completeData);
+
+      // 회원가입 완료 시 사용자 프로필 store에 데이터 로드
+      loadFromRegistration(completeData);
+
+      // Zustand store 데이터 클리어
+      clearRegistrationData();
+
+      // 성공 팝업 표시
+      setShowSuccessPopup(true);
+    } catch (error) {
+      console.error('회원가입 오류:', error);
+      alert('네트워크 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handlePopupConfirm = () => {
+    setShowSuccessPopup(false);
+    // 로그인 페이지로 이동
+    router.push('/loginpage');
   };
 
   return (
@@ -67,7 +169,7 @@ const ProfileSetupPage = () => {
                 </svg>
               </button>
             </Link>
-            <h1 className="flex-1 text-base font-semibold text-[#1A1A1A]">
+            <h1 className="ml-1 text-base font-semibold text-[#1A1A1A]">
               회원가입
             </h1>
           </div>
@@ -95,30 +197,37 @@ const ProfileSetupPage = () => {
                 className="block w-full h-full rounded-full overflow-hidden cursor-pointer bg-gray-100"
                 onClick={() => fileInputRef.current?.click()}
               >
-                {profileImage ? (
-                  <img
-                    src={profileImage}
-                    alt="프로필"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gray-200" />
-                )}
+                <img
+                  src={profileImage || defaultProfileImage}
+                  alt="프로필"
+                  className="w-full h-full object-cover"
+                />
               </label>
             </div>
 
-            <label
-              className="flex items-center gap-1 cursor-pointer"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <svg className="w-3 h-3 text-[#A6A6A6]" strokeWidth={1} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <span className="text-xs font-semibold text-[#A6A6A6] border-b border-[#A6A6A6]">
-                프로필 사진 등록
-              </span>
-            </label>
+            <div className="flex items-center gap-1 text-[#A6A6A6]">
+              <img
+                src="/icons/write.svg"
+                alt="카메라 아이콘"
+                className="w-5 h-5"
+              />
+
+              {isDefaultImage ? (
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="text-xs font-semibold text-[#A6A6A6] border-b border-[#A6A6A6] cursor-pointer"
+                >
+                  프로필 사진 등록
+                </button>
+              ) : (
+                <button
+                  onClick={resetToDefaultImage}
+                  className="text-xs font-semibold text-[#A6A6A6] border-b border-[#A6A6A6] cursor-pointer"
+                >
+                  기본이미지로 변경
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Nickname Input */}
@@ -172,15 +281,27 @@ const ProfileSetupPage = () => {
         <button
           onClick={handleNext}
           className={`w-full h-12 rounded-md font-semibold text-base text-white transition-colors ${
-            isFormValid
+            isFormValid && !isLoading
               ? 'bg-[#1A1A1A] hover:bg-[#333333]'
               : 'bg-[#A6A6A6] cursor-not-allowed'
           }`}
-          disabled={!isFormValid}
+          disabled={!isFormValid || isLoading}
         >
-          완료
+          {isLoading ? (
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span>처리 중...</span>
+            </div>
+          ) : (
+            '완료'
+          )}
         </button>
       </div>
+
+      {/* Success Popup */}
+      {showSuccessPopup && (
+        <SignupSuccessPopup onConfirm={handlePopupConfirm} />
+      )}
     </div>
   );
 };

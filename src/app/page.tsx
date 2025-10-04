@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import './globals.css'
+import './globals.css';
+import UserProfileCard from '../components/UserProfileCard';
 
 const menuItems = [
   {
@@ -77,8 +78,13 @@ export default function HomePage() {
                 <span className="text-gray-400">&gt;</span>
               </div>
             </Link>
-          </div> 
           </div>
+          </div>
+      </div>
+
+      {/* 사용자 프로필 카드 (테스트용) */}
+      <div className="px-4 py-6">
+        <UserProfileCard />
       </div>
     </>
   );

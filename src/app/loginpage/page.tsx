@@ -3,29 +3,78 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import ToastNotification from './ToastNotification';
+import ToastNotification from '../../components/ToastNotification';
 
 const loginpage = () => {
-  const [email, setEmail] = useState('admin@gmail.com');
-  const [password, setPassword] = useState('qwer1234');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '' });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = () => {
-    const validEmail = 'admin@gmail.com';
-    const validPassword = 'qwer1234';
-
-    if (email !== validEmail) {
-      setToast({ show: true, message: '아이디가 존재하지 않습니다.' });
+  const handleLogin = async () => {
+    // 입력 검증
+    if (!email.trim()) {
+      setToast({ show: true, message: '이메일을 입력해주세요.' });
       return;
     }
 
-    if (password !== validPassword) {
-      setToast({ show: true, message: '비밀번호가 일치하지 않습니다.' });
+    if (!password.trim()) {
+      setToast({ show: true, message: '비밀번호를 입력해주세요.' });
       return;
     }
 
-    console.log('로그인 성공');
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          password: password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // 로그인 성공
+        console.log('로그인 성공:', data);
+        setToast({ show: true, message: '로그인되었습니다.' });
+
+        // 토큰이 있다면 저장
+        if (data.token) {
+          localStorage.setItem('authToken', data.token);
+        }
+
+        // 메인 페이지로 이동 또는 리다이렉트
+        // router.push('/') 등으로 페이지 이동
+
+      } else {
+        // 로그인 실패
+        switch (response.status) {
+          case 401:
+            setToast({ show: true, message: '이메일 또는 비밀번호가 일치하지 않습니다.' });
+            break;
+          case 404:
+            setToast({ show: true, message: '존재하지 않는 계정입니다.' });
+            break;
+          case 429:
+            setToast({ show: true, message: '너무 많은 로그인 시도입니다. 잠시 후 다시 시도해주세요.' });
+            break;
+          default:
+            setToast({ show: true, message: data.message || '로그인에 실패했습니다.' });
+        }
+      }
+    } catch (error) {
+      console.error('로그인 오류:', error);
+      setToast({ show: true, message: '네트워크 오류가 발생했습니다.' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -38,11 +87,13 @@ const loginpage = () => {
       {/* Header with Back Button */}
       <div className="flex flex-col items-start px-5 pb-3 gap-4 w-full h-[42px] bg-white">
         <div className="flex flex-row items-center gap-1 w-full h-[30px]">
-          <button className="w-5 h-5 flex items-center justify-center">
-            <svg width="7" height="15" viewBox="0 0 7 15" fill="none" className="rotate-180">
-              <path d="M1 1L6 7.5L1 14" stroke="#1A1A1A" strokeWidth="2"/>
-            </svg>
-          </button>
+          <Link href="/">
+            <button className="w-5 h-5 flex items-center justify-center">
+              <svg width="7" height="15" viewBox="0 0 7 15" fill="none" className="rotate-180">
+                <path d="M1 1L6 7.5L1 14" stroke="#1A1A1A" strokeWidth="2"/>
+              </svg>
+            </button>
+          </Link>
         </div>
       </div>
 
@@ -109,11 +160,25 @@ const loginpage = () => {
           {/* Login Button */}
           <button
             onClick={handleLogin}
-            className="flex flex-row justify-center items-center py-[5px] px-5 gap-[2px] w-full h-12 bg-[#293A92] rounded-full"
+            disabled={isLoading}
+            className={`flex flex-row justify-center items-center py-[5px] px-5 gap-[2px] w-full h-12 rounded-full transition-colors ${
+              isLoading
+                ? 'bg-[#A6A6A6] cursor-not-allowed'
+                : 'bg-[#293A92] cursor-pointer hover:bg-[#1e2c73]'
+            }`}
           >
-            <span className="w-[56px] h-[19px] font-pretendard font-semibold text-base leading-[19px] text-white cursor-pointer">
-              로그인
-            </span>
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span className="font-pretendard font-semibold text-base text-white">
+                  로그인 중...
+                </span>
+              </div>
+            ) : (
+              <span className="w-[56px] h-[19px] font-pretendard font-semibold text-base leading-[19px] text-white cursor-pointer">
+                로그인
+              </span>
+            )}
           </button>
 
           {/* Divider Line */}
@@ -121,7 +186,7 @@ const loginpage = () => {
 
           {/* Sign Up Button */}
           <Link href="/loginpage/register">
-            <button className="flex flex-row justify-center items-center py-[5px] px-5 gap-[2px] w-[335px] h-12 border border-[#293A92] rounded-full">
+            <button className="flex flex-row justify-center items-center py-[5px] px-5 gap-[2px] w-[335px] h-12 border border-[#293A92] rounded-full cursor-pointer">
               <span className="w-[64px] h-[19px] font-pretendard font-semibold text-base leading-[19px] text-[#293A92] cursor-pointer">
                 회원가입
               </span>
@@ -130,9 +195,11 @@ const loginpage = () => {
         </div>
 
         {/* Forgot Password Link */}
-        <button className="w-full h-[17px] font-pretendard font-medium text-sm leading-[17px] text-center underline text-[#D9D9D9] cursor-pointer">
-          비밀번호를 까먹었어요
-        </button>
+        <Link href="/loginpage/reset-password">
+          <button className="w-full h-[17px] font-pretendard font-medium text-sm leading-[17px] text-center underline text-[#D9D9D9] cursor-pointer">
+            비밀번호를 까먹었어요
+          </button>
+        </Link>
       </div>
 
       {/* Home Indicator (for iPhone) */}
