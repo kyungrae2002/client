@@ -3,9 +3,11 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
+import { useRegistrationStore } from '../../../../store/registrationStore';
 
 const TermsAgreementPage = () => {
   const router = useRouter();
+  const { updateAgreements, setStep } = useRegistrationStore();
   const [agreements, setAgreements] = useState({
     all: false,
     terms: false,
@@ -36,6 +38,14 @@ const TermsAgreementPage = () => {
 
   const handleNext = () => {
     if (isNextEnabled) {
+      // Zustand store에 약관 동의 정보 저장
+      updateAgreements({
+        terms: agreements.terms,
+        privacy: agreements.privacy,
+        marketing: agreements.marketing
+      });
+
+      setStep('profile');
       router.push('/loginpage/register/profile');
     }
   };
@@ -64,9 +74,9 @@ const TermsAgreementPage = () => {
                     <path d="M1 1L6 7.5L1 14" stroke="#1A1A1A" strokeWidth="2"/>
                   </svg>
                 </button>
-                
+
                 {/* Title */}
-                <h1 className="flex-1 h-[19px] font-pretendard font-semibold text-base leading-[19px] flex items-center text-[#1A1A1A]">
+                <h1 className="ml-1 h-[19px] font-pretendard font-semibold text-base leading-[19px] flex items-center text-[#1A1A1A]">
                   회원가입
                 </h1>
               </div>
@@ -215,15 +225,10 @@ const TermsAgreementPage = () => {
           isNextEnabled ? 'bg-[#293A92]' : 'bg-[#A6A6A6]'
         }`}
       >
-        <div className="w-5 h-5 rotate-180 hidden">
-          <svg width="7" height="15" viewBox="0 0 7 15" fill="none">
-            <path d="M1 1L6 7.5L1 14" stroke="#1A1A1A" strokeWidth="2"/>
-          </svg>
-        </div>
-        <span className="flex-1 h-[19px] font-pretendard font-semibold text-base leading-[19px] flex items-center text-center text-white cursor-pointer">
+        <span className="flex-1 h-[19px] font-pretendard font-semibold text-base leading-[19px] flex items-center justify-center text-white cursor-pointer">
           다음
         </span>
-        <div className="w-5 h-5 rotate-180">
+        <div className="w-5 h-5">
           <svg width="7" height="15" viewBox="0 0 7 15" fill="none">
             <path d="M1 1L6 7.5L1 14" stroke="#FFFFFF" strokeWidth="2"/>
           </svg>

@@ -1,10 +1,15 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React, { useState, useCallback } from 'react';
 import DatePickerWheels from './date';
+import { useRegistrationStore } from '../../../store/registrationStore';
+import RegistrationDebug from '../../../components/RegistrationDebug';
 
 const SignupPage = () => {
+  const router = useRouter();
+  const { updateBasicInfo, setStep } = useRegistrationStore();
   const [formData, setFormData] = useState({
     name: '',
     birthDate: '',
@@ -111,6 +116,21 @@ const SignupPage = () => {
     setShowBirthDatePicker(false);
   };
 
+  const handleNext = () => {
+    if (isFormValid()) {
+      // Zustand store에 기본 정보 저장
+      updateBasicInfo({
+        name: formData.name.trim(),
+        birthDate: formData.birthDate,
+        email: formData.email.trim(),
+        password: formData.password,
+      });
+
+      setStep('terms');
+      router.push('/loginpage/register/terms');
+    }
+  };
+
   return (
     <div className="relative w-[375px] h-[812px] bg-white mx-auto">
       {/* Header */}
@@ -132,11 +152,11 @@ const SignupPage = () => {
                       <path d="M1 1L6 7.5L1 14" stroke="#1A1A1A" strokeWidth="2"/>
                     </svg>
                   </button>
+                </Link>
                 {/* Title */}
                 <h1 className="ml-1 h-[19px] font-pretendard font-semibold text-base leading-[19px] flex items-center text-[#1A1A1A]">
                   회원가입
                 </h1>
-                </Link>
               </div>
             </div>
           </div>
@@ -365,12 +385,7 @@ const SignupPage = () => {
 
       {/* Next Button */}
       <button
-        onClick={() => {
-          if (isFormValid()) {
-            // 이용약관 페이지로 이동
-            window.location.href = '/loginpage/terms';
-          }
-        }}
+        onClick={handleNext}
         disabled={!isFormValid()}
         className={`absolute left-1/2 transform -translate-x-1/2 top-[737px] flex flex-row justify-center items-center px-5 py-[5px] gap-[2px] w-[335px] h-12 rounded-md transition-colors duration-200 ${
           isFormValid()
@@ -378,15 +393,10 @@ const SignupPage = () => {
             : 'bg-[#A6A6A6] cursor-not-allowed'
         }`}
       >
-        <div className="w-5 h-5 rotate-180 hidden">
-          <svg width="7" height="15" viewBox="0 0 7 15" fill="none">
-            <path d="M1 1L6 7.5L1 14" stroke="#F5F5F5" strokeWidth="2"/>
-          </svg>
-        </div>
-        <span className="flex-1 h-[19px] font-pretendard font-semibold text-base leading-[19px] flex items-center text-center text-white">
+        <span className="flex-1 h-[19px] font-pretendard font-semibold text-base leading-[19px] flex items-center justify-center text-white">
           다음
         </span>
-        <div className="w-5 h-5 rotate-180">
+        <div className="w-5 h-5">
           <svg width="7" height="15" viewBox="0 0 7 15" fill="none">
             <path d="M1 1L6 7.5L1 14" stroke="#FFFFFF" strokeWidth="2"/>
           </svg>
@@ -395,6 +405,9 @@ const SignupPage = () => {
 
       {/* Home Indicator */}
       <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[375px] h-[34px] invisible"></div>
+
+      {/* Debug Component (remove in production) */}
+      <RegistrationDebug />
     </div>
   );
 };
